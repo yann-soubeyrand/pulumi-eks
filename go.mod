@@ -3,15 +3,24 @@ module github.com/pulumi/pulumi-eks
 go 1.13
 
 require (
+	cloud.google.com/go v0.45.1 // indirect
+	cloud.google.com/go/logging v1.0.0 // indirect
+	github.com/cheggaaa/pb v1.0.27 // indirect
 	github.com/docker/docker v1.13.1 // indirect
 	github.com/google/gofuzz v1.0.0 // indirect
 	github.com/googleapis/gnostic v0.2.0 // indirect
 	github.com/imdario/mergo v0.3.7 // indirect
 	github.com/json-iterator/go v1.1.6 // indirect
+	github.com/mattn/go-runewidth v0.0.4 // indirect
+	github.com/mitchellh/reflectwalk v1.0.1 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
-	github.com/pulumi/pulumi v1.6.2-0.20191209231622-bb8b1a5fd494
+	github.com/pulumi/pulumi v1.9.1
+	github.com/spf13/cobra v0.0.5 // indirect
 	github.com/stretchr/testify v1.4.1-0.20191106224347-f1bd0923b832
+	golang.org/x/crypto v0.0.0-20190820162420-60c769a6c586 // indirect
+	golang.org/x/net v0.0.0-20190926025831-c00fd9afed17 // indirect
+	google.golang.org/grpc v1.24.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.2.2
 	k8s.io/api v0.0.0-20190313235455-40a48860b5ab
