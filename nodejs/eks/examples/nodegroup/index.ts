@@ -22,6 +22,12 @@ const cluster1 = new eks.Cluster("example-nodegroup-iam-simple", {
     skipDefaultNodeGroup: true,
     deployDashboard: false,
     instanceRole: role0,
+}, {
+    customTimeouts: {
+        create: "30m",
+        update: "30m",
+        delete: "30m",
+    },
 });
 
 // There are two approaches that can be used to add additional NodeGroups.
@@ -79,6 +85,12 @@ const cluster2 = new eks.Cluster("example-nodegroup-iam-advanced", {
     skipDefaultNodeGroup: true,
     deployDashboard: false,
     instanceRoles: [role1, role2],
+}, {
+    customTimeouts: {
+        create: "30m",
+        update: "30m",
+        delete: "30m",
+    },
 });
 
 // Create node groups using a different `instanceProfile` tied to one of the many

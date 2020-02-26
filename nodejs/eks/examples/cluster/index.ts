@@ -5,7 +5,14 @@ import * as eks from "@pulumi/eks";
 const projectName = pulumi.getProject();
 
 // Create an EKS cluster with the default configuration.
-const cluster1 = new eks.Cluster(`${projectName}-1`);
+const cluster1 = new eks.Cluster(`${projectName}-1`, {},
+{
+    customTimeouts: {
+        create: "30m",
+        update: "30m",
+        delete: "30m",
+    },
+});
 
 // Create an EKS cluster with a non-default configuration.
 const vpc = new awsx.ec2.Vpc(`${projectName}-2`, {
@@ -24,6 +31,12 @@ const cluster2 = new eks.Cluster(`${projectName}-2`, {
         "audit",
         "authenticator",
     ],
+}, {
+    customTimeouts: {
+        create: "30m",
+        update: "30m",
+        delete: "30m",
+    },
 });
 
 // Export the clusters' kubeconfig.

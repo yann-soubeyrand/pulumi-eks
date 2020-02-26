@@ -36,6 +36,12 @@ const myCluster = new eks.Cluster(`${projectName}`, {
     instanceRoles: roles,
     enabledClusterLogTypes: ["api", "audit", "authenticator",
         "controllerManager", "scheduler"],
+}, {
+    customTimeouts: {
+        create: "30m",
+        update: "30m",
+        delete: "30m",
+    },
 });
 export const kubeconfig = myCluster.kubeconfig;
 export const clusterName = myCluster.core.cluster.name;

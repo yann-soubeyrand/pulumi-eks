@@ -31,6 +31,12 @@ const cluster = new eks.Cluster(`${projectName}`, {
     // cluster first for the nodegroup will error eks.createManagedNodeGroup().
     roleMappings: [roleMapping0, roleMapping1],
     instanceRoles: [roles[2]],
+}, {
+    customTimeouts: {
+        create: "30m",
+        update: "30m",
+        delete: "30m",
+    },
 });
 
 // Export the cluster's kubeconfig.

@@ -17,6 +17,12 @@ const cluster = new eks.Cluster(`${projectName}`, {
     vpcId: vpc.id,
     publicSubnetIds: publicSubnetIds,
     deployDashboard: false,
+}, {
+    customTimeouts: {
+        create: "30m",
+        update: "30m",
+        delete: "30m",
+    },
 });
 
 // Export the cluster name and kubeconfig

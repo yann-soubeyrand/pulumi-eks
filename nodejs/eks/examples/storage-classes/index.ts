@@ -7,6 +7,12 @@ const projectName = pulumi.getProject();
 const cluster1 = new eks.Cluster(`${projectName}-1`, {
     deployDashboard: false,
     storageClasses: "io1",
+}, {
+    customTimeouts: {
+        create: "30m",
+        update: "30m",
+        delete: "30m",
+    },
 });
 
 if (cluster1.core.storageClasses) {
@@ -35,6 +41,12 @@ const cluster2 = new eks.Cluster(`${projectName}-2`, {
         "mysc1": {
             type: "sc1",
         },
+    },
+}, {
+    customTimeouts: {
+        create: "30m",
+        update: "30m",
+        delete: "30m",
     },
 });
 

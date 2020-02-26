@@ -16,6 +16,12 @@ const cluster1 = new eks.Cluster("example-tags-cluster1", {
     nodeSecurityGroupTags: { "myNodeSecurityGroupTag1": "true" },
     clusterTags: { "myClusterTag1": "true" },
     deployDashboard: false,
+}, {
+    customTimeouts: {
+        create: "30m",
+        update: "30m",
+        delete: "30m",
+    },
 });
 
 // Export the cluster's kubeconfig.
@@ -35,6 +41,12 @@ const cluster2 = new eks.Cluster("example-tags-cluster2", {
     clusterSecurityGroupTags: { "myClusterSecurityGroupTag2": "true" },
     nodeSecurityGroupTags: { "myNodeSecurityGroupTag2": "true" },
     clusterTags: { "myClusterTag1": "true" },
+}, {
+    customTimeouts: {
+        create: "30m",
+        update: "30m",
+        delete: "30m",
+    },
 });
 
 // There are two approaches that can be used to add additional NodeGroups.

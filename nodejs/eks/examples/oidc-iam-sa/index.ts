@@ -40,6 +40,12 @@ const cluster = new eks.Cluster(`${projectName}`, {
     deployDashboard: false,
     instanceRoles: [role1],
     createOidcProvider: true,
+}, {
+    customTimeouts: {
+        create: "30m",
+        update: "30m",
+        delete: "30m",
+    },
 });
 
 // Export the cluster's kubeconfig.

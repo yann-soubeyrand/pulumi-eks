@@ -20,6 +20,12 @@ const testCluster = new eks.Cluster(`${projectName}`, {
     publicSubnetIds: vpc.publicSubnetIds,
     skipDefaultNodeGroup: true,
     instanceRole: role,
+}, {
+    customTimeouts: {
+        create: "30m",
+        update: "30m",
+        delete: "30m",
+    },
 });
 
 // Create a node group.

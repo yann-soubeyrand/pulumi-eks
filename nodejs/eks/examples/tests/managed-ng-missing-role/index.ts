@@ -34,6 +34,12 @@ export function createRole(name: string): aws.iam.Role {
 const cluster = new eks.Cluster(`${projectName}`, {
     skipDefaultNodeGroup: true,
     deployDashboard: false,
+}, {
+    customTimeouts: {
+        create: "30m",
+        update: "30m",
+        delete: "30m",
+    },
 });
 
 // Export the cluster's kubeconfig.

@@ -12,6 +12,12 @@ const cluster = new eks.Cluster("example-managed-nodegroups", {
     skipDefaultNodeGroup: true,
     deployDashboard: false,
     instanceRoles: [role0, role1, role2],
+}, {
+    customTimeouts: {
+        create: "30m",
+        update: "30m",
+        delete: "30m",
+    },
 });
 
 // Export the cluster's kubeconfig.

@@ -19,6 +19,12 @@ const cluster1 = new eks.Cluster("test-tag-input-types", {
     clusterSecurityGroupTags: {"myClusterSecurityGroupTag": "true" },
     nodeSecurityGroupTags: { "myNodeSecurityGroupTag": "true" },
     clusterTags: { "myClusterTag": "true" },
+}, {
+    customTimeouts: {
+        create: "30m",
+        update: "30m",
+        delete: "30m",
+    },
 });
 const cluster1Name = cluster1.core.cluster.name;
 
