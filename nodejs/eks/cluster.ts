@@ -591,13 +591,13 @@ export function createCore(name: string, args: ClusterOptions, parent: pulumi.Co
         userStorageClasses[storageClasses] = pulumi.output(
             createStorageClass(`${name.toLowerCase()}-${storageClasses}`, storageClass, {
                 parent,
-                provider: k8sProvider
+                provider: k8sProvider,
             }));
     } else {
         for (const key of Object.keys(storageClasses)) {
             userStorageClasses[key] = pulumi.output(createStorageClass(`${name.toLowerCase()}-${key}`, storageClasses[key], {
                 parent,
-                provider: k8sProvider
+                provider: k8sProvider,
             }));
         }
     }
