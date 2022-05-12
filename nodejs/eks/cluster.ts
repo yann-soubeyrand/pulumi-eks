@@ -120,6 +120,7 @@ export interface KubeconfigOptions {
      */
     profileName?: pulumi.Input<string>;
 }
+
 /**
  * CoreData defines the core set of data associated with an EKS cluster, including the network in which it runs.
  */
@@ -179,22 +180,26 @@ interface ExecEnvVar {
      */
     value: pulumi.Input<string>;
 }
+
 function generateKubeconfig(
     clusterName: pulumi.Input<string>,
     clusterEndpoint: pulumi.Input<string>,
     certData: pulumi.Input<string>,
     opts?: KubeconfigOptions) {
     let args = ["eks", "get-token", "--cluster-name", clusterName];
-    let env: ExecEnvVar[] | undefined;
+    const env: ExecEnvVar[] = [{
+        "name": "KUBERNETES_EXEC_INFO",
+        "value": `{"apiVersion": "client.authentication.k8s.io/v1beta1"}`,
+    }];
 
     if (opts?.roleArn) {
         args = [...args, "--role", opts.roleArn];
     }
     if (opts?.profileName) {
-        env = [{
+        env.push({
             "name": "AWS_PROFILE",
             "value": opts.profileName,
-        }];
+        });
     }
 
     return pulumi.all([
@@ -293,7 +298,7 @@ export function getRoleProvider(
             }`,
         ),
         description: `Admin access to eks-${name}`,
-    }, {parent, provider});
+    }, { parent, provider });
 
     // `eks:*` is needed to create/read/update/delete the EKS cluster, `iam:PassRole` is needed to pass the EKS service role to the cluster
     // https://docs.aws.amazon.com/eks/latest/userguide/service_IAM_role.html
@@ -466,7 +471,7 @@ export function createCore(name: string, args: ClusterOptions, parent: pulumi.Co
     let encryptionConfig: pulumi.Output<aws.types.output.eks.ClusterEncryptionConfig> | undefined;
     if (args.encryptionConfigKeyArn) {
         encryptionProvider = pulumi.output(args.encryptionConfigKeyArn).apply(
-            keyArn => <aws.types.output.eks.ClusterEncryptionConfigProvider>({keyArn}),
+            keyArn => <aws.types.output.eks.ClusterEncryptionConfigProvider>({ keyArn }),
         );
         encryptionConfig = encryptionProvider.apply(ep => (<aws.types.output.eks.ClusterEncryptionConfig>{
             provider: ep,
@@ -562,7 +567,7 @@ export function createCore(name: string, args: ClusterOptions, parent: pulumi.Co
 
             if (args.creationRoleProvider) {
                 config = args.creationRoleProvider.role.arn.apply(arn => {
-                    const opts: KubeconfigOptions = {roleArn: arn};
+                    const opts: KubeconfigOptions = { roleArn: arn };
                     return generateKubeconfig(clusterName, clusterEndpoint, clusterCertificateAuthority.data, opts);
                 });
             } else if (providerCredentialOpts) {
@@ -584,10 +589,16 @@ export function createCore(name: string, args: ClusterOptions, parent: pulumi.Co
     if (typeof storageClasses === "string") {
         const storageClass = { type: storageClasses, default: true };
         userStorageClasses[storageClasses] = pulumi.output(
-            createStorageClass(`${name.toLowerCase()}-${storageClasses}`, storageClass, { parent, provider: k8sProvider }));
+            createStorageClass(`${name.toLowerCase()}-${storageClasses}`, storageClass, {
+                parent,
+                provider: k8sProvider
+            }));
     } else {
         for (const key of Object.keys(storageClasses)) {
-            userStorageClasses[key] = pulumi.output(createStorageClass(`${name.toLowerCase()}-${key}`, storageClasses[key], { parent, provider: k8sProvider }));
+            userStorageClasses[key] = pulumi.output(createStorageClass(`${name.toLowerCase()}-${key}`, storageClasses[key], {
+                parent,
+                provider: k8sProvider
+            }));
         }
     }
 
@@ -634,7 +645,7 @@ export function createCore(name: string, args: ClusterOptions, parent: pulumi.Co
             const customRolePolicy = new aws.iam.RolePolicy(`${name}-EKSWorkerCustomPolicy`, {
                 role: instanceRole,
                 policy: args.customInstanceRolePolicy,
-            }, {parent, provider});
+            }, { parent, provider });
         }
 
         // Create an instance profile if using a default node group
@@ -720,7 +731,7 @@ export function createCore(name: string, args: ClusterOptions, parent: pulumi.Co
                 podExecutionRoleArn: podExecutionRoleArn,
                 selectors: selectors,
                 subnetIds: pulumi.output(clusterSubnetIds).apply(subnets => computeWorkerSubnets(parent, subnets)),
-            }, { parent, dependsOn: [eksNodeAccess], provider});
+            }, { parent, dependsOn: [eksNodeAccess], provider });
 
             // Once the FargateProfile has been created, try to patch CoreDNS if needed.  See
             // https://docs.aws.amazon.com/eks/latest/userguide/fargate-getting-started.html#fargate-gs-coredns.
@@ -754,8 +765,8 @@ export function createCore(name: string, args: ClusterOptions, parent: pulumi.Co
     let oidcProvider: aws.iam.OpenIdConnectProvider | undefined;
     if (args.createOidcProvider) {
         // Retrieve the OIDC provider URL's intermediate root CA fingerprint.
-        const awsRegionName = pulumi.output(aws.getRegion({}, {parent, async: true })).name;
-        const eksOidcProviderUrl = pulumi.interpolate `https://oidc.eks.${awsRegionName}.amazonaws.com`;
+        const awsRegionName = pulumi.output(aws.getRegion({}, { parent, async: true })).name;
+        const eksOidcProviderUrl = pulumi.interpolate`https://oidc.eks.${awsRegionName}.amazonaws.com`;
         const agent = createHttpAgent(args.proxy);
         const fingerprint = getIssuerCAThumbprint(eksOidcProviderUrl, agent);
 
@@ -1147,7 +1158,7 @@ export interface ClusterOptions {
     /**
      * Key-value mapping of tags that are automatically applied to all AWS
      * resources directly under management with this cluster, which support tagging.
-    */
+     */
     tags?: InputTags;
 
     /**
@@ -1300,7 +1311,8 @@ export interface FargateProfile {
  * ClusterNodeGroupOptions describes the configuration options accepted by a cluster
  * to create its own node groups. It's a subset of NodeGroupOptions.
  */
-export interface ClusterNodeGroupOptions extends NodeGroupBaseOptions { }
+export interface ClusterNodeGroupOptions extends NodeGroupBaseOptions {
+}
 
 /**
  * Cluster is a component that wraps the AWS and Kubernetes resources necessary to run an EKS cluster, its worker
@@ -1468,7 +1480,7 @@ export class Cluster extends pulumi.ComponentResource {
      * https://docs.aws.amazon.com/eks/latest/userguide/worker.html
      */
     createNodeGroup(name: string, args: ClusterNodeGroupOptions): NodeGroup {
-        const awsProvider = this.core.awsProvider ? {aws: this.core.awsProvider} : undefined;
+        const awsProvider = this.core.awsProvider ? { aws: this.core.awsProvider } : undefined;
         return new NodeGroup(name, {
             ...args,
             cluster: this.core,
